@@ -726,13 +726,16 @@
 
     <script>
         // Google Apps Script Webhook Configuration
-        // Configuration
+  // Configuration
 const CONFIG = {
-    WEBHOOK_URL: 'https://script.google.com/macros/s/AKfycbyvaGtpNkV9YbMBRlVw_7LCkpv9lFIVdV2v4C6ACmIQPt43oqiUv-5FZERtwNO8GalCNA/exec',
-    INVENTORY_APP_URL: 'https://abusalim.sa',
+    WEBHOOK_URL: 'https://script.google.com/macros/s/AKfycbypNlDwq8u569ItnK_QL02T_K45PBZVf2RKNvMDiK93cEmnLL1jKezc0Aebtbvo5_hw4A/exec',
+    INVENTORY_APP_URL: 'https://abusalim.netlify.app',  // or 'https://abusalim.sa' when domain works
     AUTO_SAVE: true,
     SAVE_INTERVAL: 60000 // Auto-save every minute
 };
+
+// For backward compatibility
+const WEBHOOK_URL = CONFIG.WEBHOOK_URL;
 
 // For backward compatibility
 const WEBHOOK_URL = CONFIG.WEBHOOK_URL;
