@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management System</title>
+    <meta name="description" content="Al-Hasa Inventory Stock Verification System">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #06b6d4;
+            --dark: #111827;
+            --light: #f9fafb;
+            --border: #e5e7eb;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        /* Navigation Bar */
+        .nav-bar {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--dark);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: var(--light);
+            color: var(--primary);
+        }
+
+        .nav-link.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--light);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .sync-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #fbbf24;
+            animation: pulse 2s infinite;
+        }
+
+        .sync-indicator.synced {
+            background: #10b981;
+        }
+
+        .sync-indicator.error {
+            background: #ef4444;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 20px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.95;
+            font-size: 14px;
+        }
+
+        .app-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+
+        .route-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .route-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .route-btn {
+            padding: 12px;
+            border: 2px solid var(--border);
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--dark);
+            text-align: center;
+        }
+
+        .route-btn:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.2);
+        }
+
+        .route-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .route-btn.completed {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+            position: relative;
+        }
+
+        .route-btn.completed::after {
+            content: '✔';
+            position: absolute;
+            top: 3px;
+            right: 5px;
+            font-size: 16px;
+        }
+
+        .date-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .date-input {
+            padding: 10px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .info-display {
+            padding: 10px;
+            background: #eff6ff;
+            border: 2px solid #93c5fd;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .content {
+            padding: 15px;
+        }
+
+        .category-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .category-header {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .category-title {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .collapse-icon {
+            font-size: 18px;
+            transition: transform 0.3s;
+        }
+
+        .category-card.collapsed .collapse-icon {
+            transform: rotate(-90deg);
+        }
+
+        .category-card.collapsed .category-content {
+            display: none;
+        }
+
+        .category-content {
+            padding: 15px;
+            background: #fafafa;
+            overflow-x: auto;
+        }
+
+        .stock-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            min-width: 900px;
+        }
+
+        .stock-table th {
+            background: #374151;
+            color: white;
+            padding: 10px 8px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            white-space: nowrap;
+        }
+
+        .stock-table th:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 11;
+            background: #1f2937;
+            min-width: 140px;
+        }
+
+        .stock-table th.input-col {
+            background: #059669;
+        }
+
+        .stock-table th.system-col {
+            background: #0891b2;
+        }
+
+        .stock-table th.calc-col {
+            background: #dc2626;
+        }
+
+        .stock-table td {
+            padding: 8px;
+            background: white;
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .stock-table td:first-child {
+            position: sticky;
+            left: 0;
+            background: #f3f4f6;
+            z-index: 1;
+            border-right: 2px solid var(--border);
+            text-align: left;
+        }
+
+        .item-code {
+            font-weight: 700;
+            color: var(--primary-dark);
+            font-size: 13px;
+        }
+
+        .item-name {
+            font-size: 11px;
+            color: #6b7280;
+            margin-top: 2px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .stock-input {
+            width: 65px;
+            padding: 6px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            font-size: 13px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .stock-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: #eff6ff;
+        }
+
+        .stock-input.physical {
+            background: #fef3c7;
+            border-color: #fbbf24;
+        }
+
+        .stock-input.system {
+            background: #e0f2fe;
+            border-color: #0ea5e9;
+        }
+
+        .stock-input.reimbursed {
+            background: #f0fdf4;
+            border-color: #22c55e;
+        }
+
+        .unit-select {
+            width: 65px;
+            padding: 3px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 10px;
+            background: #f9fafb;
+            cursor: pointer;
+        }
+
+        .difference {
+            padding: 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .difference.shortage {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .difference.excess {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .difference.match {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .summary-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e40af, #7c3aed);
+            border-radius: 12px;
+            color: white;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .summary-card {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .summary-label {
+            font-size: 11px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .summary-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .status-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+
+        .status-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        .status-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 0;
+                margin: -10px;
+            }
+            
+            .route-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .stock-input {
+                width: 55px;
+                padding: 5px;
+                font-size: 11px;
+            }
+            
+            .unit-select {
+                width: 55px;
+                font-size: 9px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <div class="nav-bar">
+        <div class="nav-brand">
+            <span>📦</span>
+            <span>Inventory System</span>
+        </div>
+        <div class="nav-links">
+            <a href="#" class="nav-link active">Stock Entry</a>
+            <a href="#reports" class="nav-link">Reports</a>
+            <a href="#settings" class="nav-link">Settings</a>
+        </div>
+        <div class="sync-status">
+            <div class="sync-indicator" id="syncIndicator"></div>
+            <span id="syncStatus">Checking...</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>📦 Inventory Stock Verification</h1>
+            <p>Physical stock entry and verification system</p>
+            <div class="app-badge">INVENTORY DEPT</div>
+        </div>
+
+        <div class="route-section">
+            <div class="section-title">Select Sales Route</div>
+            <div class="route-grid">
+                <button class="route-btn" onclick="selectRoute('Al-Hasa 1')">Al-Hasa 1</button>
+                <button class="route-btn" onclick="selectRoute('Al-Hasa 2')">Al-Hasa 2</button>
+                <button class="route-btn" onclick="selectRoute('Al-Hasa 3')">Al-Hasa 3</button>
+                <button class="route-btn" onclick="selectRoute('Al-Hasa 4')">Al-Hasa 4</button>
+                <button class="route-btn" onclick="selectRoute('Al-Hasa Wholesale')">Wholesale</button>
+            </div>
+            <div class="date-info">
+                <input type="date" class="date-input" id="verificationDate">
+                <div class="info-display">
+                    Route: <strong id="selectedRoute">Not Selected</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div id="statusMessage" class="hidden"></div>
+
+            <!-- Quick Actions -->
+            <div style="margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-warning" onclick="loadPreviousData()">
+                    📋 Load Previous Entry
+                </button>
+                <button class="btn btn-primary" onclick="autoCalculate()">
+                    🔄 Auto Calculate All
+                </button>
+                <button class="btn btn-primary" onclick="fetchFromCashSystem()">
+                    💰 Get Sales Data
+                </button>
+            </div>
+
+            <!-- Product Categories will be rendered here -->
+            <div id="categoriesContainer">
+                <!-- Categories will be dynamically inserted -->
+            </div>
+
+            <!-- Summary Section -->
+            <div class="summary-section">
+                <h3>📊 Daily Summary</h3>
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="summary-label">Total Items</div>
+                        <div class="summary-value" id="totalItems">14</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-label">Items Matched</div>
+                        <div class="summary-value" id="itemsMatched">0</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-label">Shortage Items</div>
+                        <div class="summary-value" id="itemsShortage">0</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-label">Excess Items</div>
+                        <div class="summary-value" id="itemsExcess">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-success" onclick="saveData()" id="saveBtn">
+                    💾 Save to Google Sheets
+                </button>
+                <button class="btn btn-primary" onclick="exportReport()">
+                    📄 Export Report
+                </button>
+                <button class="btn btn-danger" onclick="clearData()">
+                    🗑️ Clear All
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script>
+        // Configuration - Can be set via environment variables in Netlify
+        const CONFIG = {
+            WEBHOOK_URL: window.WEBHOOK_URL || 'https://script.google.com/macros/s/AKfycbyvaGtpNkV9YbMBRlVw_7LCkpv9lFIVdV2v4C6ACmIQPt43oqiUv-5FZERtwNO8GalCNA/exec',
+            CASH_APP_URL: window.CASH_APP_URL || 'https://cash-app.netlify.app',
+            AUTO_SAVE: true,
+            SAVE_INTERVAL: 60000 // Auto-save every minute
+        };
+        
+        // Inventory data structure
+        const inventory = {
+            sunflower: {
+                icon: '🌻',
+                name: 'SUNFLOWER SEEDS',
+                items: [
+                    { code: '4402', name: '200g Pack', units: ['Bag', 'Bundle'], conversion: { 'Bag': 1, 'Bundle': 5 } },
+                    { code: '4401', name: '100g Pack', units: ['Bag', 'Bundle'], conversion: { 'Bag': 1, 'Bundle': 5 } },
+                    { code: '1129', name: '25g Pack', units: ['Bag', 'Bundle'], conversion: { 'Bag': 1, 'Bundle': 6 } },
+                    { code: '1116', name: '800g Pack', units: ['Bag', 'Carton'], conversion: { 'Bag': 1, 'Carton': 12 } },
+                    { code: '1145', name: '130g Pack', units: ['Box', 'Carton'], conversion: { 'Box': 1, 'Carton': 6 } },
+                    { code: '1126', name: '10KG Bulk', units: ['Sack'], conversion: { 'Sack': 1 } }
+                ]
+            },
+            pumpkin: {
+                icon: '🎃',
+                name: 'PUMPKIN SEEDS',
+                items: [
+                    { code: '8001', name: '15g Pack', units: ['Box', 'Carton'], conversion: { 'Box': 1, 'Carton': 6 } },
+                    { code: '8002', name: '110g Pack', units: ['Box', 'Carton'], conversion: { 'Box': 1, 'Carton': 6 } },
+                    { code: '1142', name: '10KG Bulk', units: ['Sack'], conversion: { 'Sack': 1 } }
+                ]
+            },
+            melon: {
+                icon: '🍈',
+                name: 'MELON SEEDS',
+                items: [
+                    { code: '9001', name: '15g Pack', units: ['Box', 'Carton'], conversion: { 'Box': 1, 'Carton': 6 } },
+                    { code: '9002', name: '110g Pack', units: ['Box', 'Carton'], conversion: { 'Box': 1, 'Carton': 6 } }
+                ]
+            },
+            popcorn: {
+                icon: '🍿',
+                name: 'POPCORN',
+                items: [
+                    { code: '1701', name: 'Cheese', units: ['Bag', 'Carton'], conversion: { 'Bag': 1, 'Carton': 8 } },
+                    { code: '1702', name: 'Butter', units: ['Bag', 'Carton'], conversion: { 'Bag': 1, 'Carton': 8 } },
+                    { code: '1703', name: 'Lightly Salted', units: ['Bag', 'Carton'], conversion: { 'Bag': 1, 'Carton': 8 } }
+                ]
+            }
+        };
+
+        let currentRoute = '';
+        let connectionStatus = false;
+        let autoSaveInterval = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeApp();
+        });
+
+        function initializeApp() {
+            // Set today's date
+            const today = new Date();
+            const offset = today.getTimezoneOffset();
+            const localDate = new Date(today.getTime() - (offset * 60 * 1000));
+            document.getElementById('verificationDate').value = localDate.toISOString().split('T')[0];
+            
+            renderCategories();
+            loadFromStorage();
+            checkCompletedRoutes();
+            testConnection();
+            
+            // Set up auto-save if enabled
+            if (CONFIG.AUTO_SAVE) {
+                autoSaveInterval = setInterval(() => {
+                    saveToStorage();
+                }, CONFIG.SAVE_INTERVAL);
+            }
+            
+            // Add keyboard shortcuts
+            document.addEventListener('keydown', handleKeyboardShortcuts);
+            
+            // Check for shared data from cash app
+            checkSharedData();
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('categoriesContainer');
+            container.innerHTML = '';
+            
+            Object.entries(inventory).forEach(([categoryKey, categoryData]) => {
+                const categoryCard = document.createElement('div');
+                categoryCard.className = 'category-card';
+                categoryCard.id = `${categoryKey}Card`;
+                
+                categoryCard.innerHTML = `
+                    <div class="category-header" onclick="toggleCategory('${categoryKey}Card')">
+                        <div class="category-title">
+                            <span>${categoryData.icon}</span>
+                            <span>${categoryData.name}</span>
+                        </div>
+                        <span class="collapse-icon">▼</span>
+                    </div>
+                    <div class="category-content">
+                        <table class="stock-table">
+                            <thead>
+                                <tr>
+                                    <th>Item Details</th>
+                                    <th class="input-col">Physical Stock</th>
+                                    <th class="input-col">Stock Transfer</th>
+                                    <th class="system-col">System Stock</th>
+                                    <th class="calc-col">Difference</th>
+                                    <th class="input-col">Pieces Reimbursed</th>
+                                </tr>
+                            </thead>
+                            <tbody id="${categoryKey}Items"></tbody>
+                        </table>
+                    </div>
+                `;
+                
+                container.appendChild(categoryCard);
+                renderCategoryItems(categoryKey, categoryData.items);
+            });
+        }
+
+        function renderCategoryItems(category, items) {
+            const tbody = document.getElementById(`${category}Items`);
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            items.forEach(item => {
+                const unitOptions = item.units.map(unit => 
+                    `<option value="${unit}">${unit}</option>`
+                ).join('');
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <div class="item-code">${item.code}</div>
+                        <div class="item-name">${item.name}</div>
+                    </td>
+                    <td>
+                        <div class="input-group">
+                            <input type="number" class="stock-input physical" 
+                                   id="${category}_${item.code}_physical" 
+                                   placeholder="0" min="0" 
+                                   onchange="calculateDifference('${category}', '${item.code}')"
+                                   onkeyup="handleEnterKey(event, '${category}', '${item.code}', 'physical')">
+                            <select class="unit-select" id="${category}_${item.code}_physUnit" 
+                                    onchange="calculateDifference('${category}', '${item.code}')">
+                                ${unitOptions}
+                            </select>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group">
+                            <input type="number" class="stock-input" 
+                                   id="${category}_${item.code}_transfer" 
+                                   placeholder="0" min="0" 
+                                   onchange="saveToStorage()"
+                                   onkeyup="handleEnterKey(event, '${category}', '${item.code}', 'transfer')">
+                            <select class="unit-select" id="${category}_${item.code}_transUnit" 
+                                    onchange="saveToStorage()">
+                                ${unitOptions}
+                            </select>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group">
+                            <input type="number" class="stock-input system" 
+                                   id="${category}_${item.code}_system" 
+                                   placeholder="0" min="0" 
+                                   onchange="calculateDifference('${category}', '${item.code}')"
+                                   onkeyup="handleEnterKey(event, '${category}', '${item.code}', 'system')">
+                            <select class="unit-select" id="${category}_${item.code}_sysUnit" 
+                                    onchange="calculateDifference('${category}', '${item.code}')">
+                                ${unitOptions}
+                            </select>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="difference match" id="${category}_${item.code}_diff">0</div>
+                    </td>
+                    <td>
+                        <div class="input-group">
+                            <input type="number" class="stock-input reimbursed" 
+                                   id="${category}_${item.code}_reimburse" 
+                                   placeholder="0" min="0"
+                                   onchange="saveToStorage()"
+                                   onkeyup="handleEnterKey(event, '${category}', '${item.code}', 'reimburse')">
+                            <select class="unit-select" id="${category}_${item.code}_reimbUnit"
+                                    onchange="saveToStorage()">
+                                <option value="Pieces">Pieces</option>
+                            </select>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        async function testConnection() {
+            const indicator = document.getElementById('syncIndicator');
+            const statusText = document.getElementById('syncStatus');
+            
+            try {
+                indicator.className = 'sync-indicator';
+                statusText.textContent = 'Connecting...';
+                
+                const response = await fetch(CONFIG.WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'getSummaryData' })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.status === 'success') {
+                        connectionStatus = true;
+                        indicator.classList.add('synced');
+                        statusText.textContent = 'Connected';
+                    } else {
+                        throw new Error('Invalid response');
+                    }
+                } else {
+                    throw new Error('Connection failed');
+                }
+            } catch (error) {
+                connectionStatus = false;
+                indicator.classList.add('error');
+                statusText.textContent = 'Offline Mode';
+                console.error('Connection test failed:', error);
+            }
+        }
+
+        // Function to communicate with Cash App
+        async function fetchFromCashSystem() {
+            try {
+                showLoading(true);
+                
+                // Try to get data from the Cash app via localStorage or API
+                const sharedData = localStorage.getItem('sharedCashData');
+                if (sharedData) {
+                    const data = JSON.parse(sharedData);
+                    processCashData(data);
+                    showStatus('Sales data loaded from Cash System!', 'success');
+                } else {
+                    // If cash app is on different subdomain, you might need to use postMessage
+                    showStatus('No sales data available. Please ensure Cash System has saved data.', 'warning');
+                }
+            } catch (error) {
+                console.error('Error fetching cash data:', error);
+                showStatus('Unable to fetch sales data', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function processCashData(data) {
+            // Process sales data from cash system
+            if (data.salesItems) {
+                data.salesItems.forEach(item => {
+                    // Find the corresponding inventory item and update
+                    Object.keys(inventory).forEach(category => {
+                        const invItem = inventory[category].items.find(i => i.code === item.code);
+                        if (invItem) {
+                            // You can pre-populate or calculate based on sales
+                            console.log(`Sales data for ${item.code}: ${item.quantity} units sold`);
+                        }
+                    });
+                });
+            }
+        }
+
+        function checkSharedData() {
+            // Check if there's shared data in localStorage or sessionStorage
+            const urlParams = new URLSearchParams(window.location.search);
+            const sharedRoute = urlParams.get('route');
+            const sharedDate = urlParams.get('date');
+            
+            if (sharedRoute) {
+                selectRoute(sharedRoute);
+            }
+            if (sharedDate) {
+                document.getElementById('verificationDate').value = sharedDate;
+            }
+        }
+
+        function selectRoute(route) {
+            currentRoute = route;
+            document.getElementById('selectedRoute').textContent = route;
+            
+            document.querySelectorAll('.route-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent === route || (btn.textContent === 'Wholesale' && route === 'Al-Hasa Wholesale')) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            saveToStorage();
+        }
+
+        function toggleCategory(cardId) {
+            const card = document.getElementById(cardId);
+            if (card) {
+                card.classList.toggle('collapsed');
+            }
+        }
+
+        function calculateDifference(category, code) {
+            const categoryData = inventory[category];
+            const item = categoryData.items.find(i => i.code === code);
+            if (!item) return;
+            
+            try {
+                // Get physical stock with unit conversion
+                const physicalInput = document.getElementById(`${category}_${code}_physical`);
+                const physical = parseFloat(physicalInput.value) || 0;
+                const physUnit = document.getElementById(`${category}_${code}_physUnit`).value;
+                const physConv = item.conversion[physUnit] || 1;
+                const physicalBase = physical * physConv;
+                
+                // Get system stock with unit conversion
+                const systemInput = document.getElementById(`${category}_${code}_system`);
+                const system = parseFloat(systemInput.value) || 0;
+                const sysUnit = document.getElementById(`${category}_${code}_sysUnit`).value;
+                const sysConv = item.conversion[sysUnit] || 1;
+                const systemBase = system * sysConv;
+                
+                // Calculate difference in base units: Physical - System
+                const difference = physicalBase - systemBase;
+                
+                // Update difference display
+                const diffEl = document.getElementById(`${category}_${code}_diff`);
+                if (diffEl) {
+                    diffEl.textContent = difference;
+                    
+                    // Update styling based on difference
+                    diffEl.className = 'difference';
+                    if (difference < 0) {
+                        diffEl.classList.add('shortage');
+                    } else if (difference > 0) {
+                        diffEl.classList.add('excess');
+                    } else {
+                        diffEl.classList.add('match');
+                    }
+                }
+                
+                updateSummary();
+                saveToStorage();
+            } catch (error) {
+                console.error('Error calculating difference:', error);
+            }
+        }
+
+        function autoCalculate() {
+            Object.keys(inventory).forEach(category => {
+                inventory[category].items.forEach(item => {
+                    calculateDifference(category, item.code);
+                });
+            });
+            showStatus('All differences calculated!', 'success');
+        }
+
+        function updateSummary() {
+            let matched = 0, shortage = 0, excess = 0, total = 0;
+            
+            Object.keys(inventory).forEach(category => {
+                inventory[category].items.forEach(item => {
+                    total++;
+                    const diffEl = document.getElementById(`${category}_${item.code}_diff`);
+                    if (diffEl) {
+                        const diff = parseFloat(diffEl.textContent) || 0;
+                        if (diff === 0) {
+                            matched++;
+                        } else if (diff < 0) {
+                            shortage++;
+                        } else if (diff > 0) {
+                            excess++;
+                        }
+                    }
+                });
+            });
+            
+            document.getElementById('totalItems').textContent = total;
+            document.getElementById('itemsMatched').textContent = matched;
+            document.getElementById('itemsShortage').textContent = shortage;
+            document.getElementById('itemsExcess').textContent = excess;
+        }
+
+        function handleEnterKey(event, category, code, field) {
+            if (event.key === 'Enter') {
+                const inputs = document.querySelectorAll('.stock-input');
+                const currentInput = event.target;
+                const currentIndex = Array.from(inputs).indexOf(currentInput);
+                
+                if (currentIndex < inputs.length - 1) {
+                    inputs[currentIndex + 1].focus();
+                }
+            }
+        }
+
+        function handleKeyboardShortcuts(e) {
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveData();
+            }
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                exportReport();
+            }
+        }
+
+        async function saveData() {
+            if (!currentRoute) {
+                showStatus('⚠️ Please select a route first!', 'error');
+                return;
+            }
+            
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.disabled = true;
+            showLoading(true);
+            
+            const data = collectData();
+            const payload = {
+                action: 'saveInventoryData',
+                route: currentRoute,
+                date: document.getElementById('verificationDate').value,
+                items: data,
+                timestamp: new Date().toISOString()
+            };
+            
+            try {
+                if (!connectionStatus) {
+                    saveBackupLocally(payload);
+                    showStatus('⚠️ Offline mode. Data saved locally!', 'warning');
+                    return;
+                }
+                
+                const response = await fetch(CONFIG.WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    markRouteCompleted();
+                    showStatus('✅ Data saved to Google Sheets!', 'success');
+                    saveBackupLocally(payload);
+                    
+                    // Share data with cash app if needed
+                    localStorage.setItem('sharedInventoryData', JSON.stringify(payload));
+                } else {
+                    throw new Error(result.data || 'Unknown error');
+                }
+                
+            } catch (error) {
+                console.error('Save error:', error);
+                saveBackupLocally(payload);
+                showStatus('⌛ Saved locally. Will sync when online.', 'warning');
+            } finally {
+                saveBtn.disabled = false;
+                showLoading(false);
+            }
+        }
+
+        function collectData() {
+            const data = [];
+            
+            Object.keys(inventory).forEach(category => {
+                inventory[category].items.forEach(item => {
+                    const physical = document.getElementById(`${category}_${item.code}_physical`).value || '0';
+                    const physUnit = document.getElementById(`${category}_${item.code}_physUnit`).value;
+                    const transfer = document.getElementById(`${category}_${item.code}_transfer`).value || '0';
+                    const transUnit = document.getElementById(`${category}_${item.code}_transUnit`).value;
+                    const system = document.getElementById(`${category}_${item.code}_system`).value || '0';
+                    const sysUnit = document.getElementById(`${category}_${item.code}_sysUnit`).value;
+                    const reimburse = document.getElementById(`${category}_${item.code}_reimburse`).value || '0';
+                    const reimbUnit = document.getElementById(`${category}_${item.code}_reimbUnit`).value;
+                    const difference = document.getElementById(`${category}_${item.code}_diff`).textContent;
+                    
+                    if (physical !== '0' || system !== '0' || transfer !== '0') {
+                        data.push({
+                            category: category.toUpperCase(),
+                            code: item.code,
+                            name: item.name,
+                            physical: physical,
+                            physUnit: physUnit,
+                            transfer: transfer,
+                            transUnit: transUnit,
+                            system: system,
+                            sysUnit: sysUnit,
+                            difference: difference,
+                            reimburse: reimburse,
+                            reimbUnit: reimbUnit
+                        });
+                    }
+                });
+            });
+            
+            return data;
+        }
+
+        function saveBackupLocally(payload) {
+            const backups = JSON.parse(localStorage.getItem('inventoryBackups') || '[]');
+            backups.push({
+                date: new Date().toISOString(),
+                data: payload
+            });
+            if (backups.length > 10) {
+                backups.shift();
+            }
+            localStorage.setItem('inventoryBackups', JSON.stringify(backups));
+        }
+
+        function markRouteCompleted() {
+            document.querySelectorAll('.route-btn').forEach(btn => {
+                if (btn.classList.contains('active')) {
+                    btn.classList.add('completed');
+                }
+            });
+            
+            const completed = JSON.parse(localStorage.getItem('completedRoutes') || '{}');
+            const today = document.getElementById('verificationDate').value;
+            if (!completed[today]) {
+                completed[today] = [];
+            }
+            if (!completed[today].includes(currentRoute)) {
+                completed[today].push(currentRoute);
+            }
+            localStorage.setItem('completedRoutes', JSON.stringify(completed));
+        }
+
+        function checkCompletedRoutes() {
+            const completed = JSON.parse(localStorage.getItem('completedRoutes') || '{}');
+            const today = document.getElementById('verificationDate').value;
+            const todayCompleted = completed[today] || [];
+            
+            document.querySelectorAll('.route-btn').forEach(btn => {
+                const routeText = btn.textContent;
+                const route = routeText === 'Wholesale' ? 'Al-Hasa Wholesale' : routeText;
+                
+                if (todayCompleted.includes(route)) {
+                    btn.classList.add('completed');
+                } else {
+                    btn.classList.remove('completed');
+                }
+            });
+        }
+
+        function exportReport() {
+            const data = collectData();
+            const date = document.getElementById('verificationDate').value;
+            
+            if (data.length === 0) {
+                showStatus('⚠️ No data to export!', 'warning');
+                return;
+            }
+            
+            let csv = 'Date,Route,Category,Code,Item,Physical,P.Unit,Transfer,T.Unit,System,S.Unit,Difference,Reimbursed,R.Unit\n';
+            
+            data.forEach(row => {
+                csv += `${date},${currentRoute || 'Not Selected'},${row.category},${row.code},"${row.name}",`;
+                csv += `${row.physical},${row.physUnit},${row.transfer},${row.transUnit},`;
+                csv += `${row.system},${row.sysUnit},${row.difference},${row.reimburse},${row.reimbUnit}\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `inventory_${currentRoute || 'data'}_${date}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showStatus('📄 Report exported!', 'success');
+        }
+
+        function clearData() {
+            if (!confirm('Clear all data? This cannot be undone.')) return;
+            
+            document.querySelectorAll('.stock-input').forEach(input => {
+                input.value = '';
+            });
+            
+            document.querySelectorAll('.difference').forEach(diff => {
+                diff.textContent = '0';
+                diff.className = 'difference match';
+            });
+            
+            document.querySelectorAll('.unit-select').forEach(select => {
+                if (select.options.length > 0) {
+                    select.selectedIndex = 0;
+                }
+            });
+            
+            updateSummary();
+            saveToStorage();
+            showStatus('Data cleared!', 'success');
+        }
+
+        function saveToStorage() {
+            const data = {
+                route: currentRoute,
+                date: document.getElementById('verificationDate').value,
+                items: collectData()
+            };
+            localStorage.setItem('inventoryData', JSON.stringify(data));
+        }
+
+        function loadFromStorage() {
+            const saved = localStorage.getItem('inventoryData');
+            if (!saved) return;
+            
+            try {
+                const data = JSON.parse(saved);
+                
+                if (data.route) {
+                    selectRoute(data.route);
+                }
+                
+                if (data.date) {
+                    document.getElementById('verificationDate').value = data.date;
+                }
+                
+                if (data.items && Array.isArray(data.items)) {
+                    data.items.forEach(item => {
+                        const category = item.category.toLowerCase();
+                        
+                        const physEl = document.getElementById(`${category}_${item.code}_physical`);
+                        if (physEl) physEl.value = item.physical;
+                        const physUnitEl = document.getElementById(`${category}_${item.code}_physUnit`);
+                        if (physUnitEl && item.physUnit) physUnitEl.value = item.physUnit;
+                        
+                        const transEl = document.getElementById(`${category}_${item.code}_transfer`);
+                        if (transEl) transEl.value = item.transfer;
+                        const transUnitEl = document.getElementById(`${category}_${item.code}_transUnit`);
+                        if (transUnitEl && item.transUnit) transUnitEl.value = item.transUnit;
+                        
+                        const sysEl = document.getElementById(`${category}_${item.code}_system`);
+                        if (sysEl) sysEl.value = item.system;
+                        const sysUnitEl = document.getElementById(`${category}_${item.code}_sysUnit`);
+                        if (sysUnitEl && item.sysUnit) sysUnitEl.value = item.sysUnit;
+                        
+                        const reimbEl = document.getElementById(`${category}_${item.code}_reimburse`);
+                        if (reimbEl) reimbEl.value = item.reimburse;
+                        
+                        if (physEl) {
+                            calculateDifference(category, item.code);
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading saved data:', error);
+            }
+        }
+
+        function loadPreviousData() {
+            const backups = JSON.parse(localStorage.getItem('inventoryBackups') || '[]');
+            
+            if (backups.length === 0) {
+                showStatus('No previous data found!', 'warning');
+                return;
+            }
+            
+            const lastBackup = backups[backups.length - 1];
+            
+            if (confirm(`Load data from ${new Date(lastBackup.date).toLocaleString()}?`)) {
+                const data = lastBackup.data;
+                
+                if (data.route) {
+                    selectRoute(data.route);
+                }
+                
+                if (data.items) {
+                    data.items.forEach(item => {
+                        const category = item.category.toLowerCase();
+                        
+                        const sysEl = document.getElementById(`${category}_${item.code}_system`);
+                        if (sysEl) sysEl.value = item.physical;
+                        const sysUnitEl = document.getElementById(`${category}_${item.code}_sysUnit`);
+                        if (sysUnitEl && item.physUnit) sysUnitEl.value = item.physUnit;
+                        
+                        const physEl = document.getElementById(`${category}_${item.code}_physical`);
+                        if (physEl) physEl.value = '';
+                        
+                        calculateDifference(category, item.code);
+                    });
+                }
+                
+                showStatus('Previous data loaded!', 'success');
+            }
+        }
+
+        function showStatus(message, type = 'success') {
+            const statusDiv = document.getElementById('statusMessage');
+            if (statusDiv) {
+                statusDiv.className = `status-message status-${type}`;
+                statusDiv.textContent = message;
+                statusDiv.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    statusDiv.classList.add('hidden');
+                }, 4000);
+            }
+        }
+
+        function showLoading(show = true) {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                if (show) {
+                    overlay.classList.remove('hidden');
+                } else {
+                    overlay.classList.add('hidden');
+                }
+            }
+        }
+
+        // Add date change listener
+        document.getElementById('verificationDate').addEventListener('change', () => {
+            checkCompletedRoutes();
+            saveToStorage();
+        });
+    </script>
+</body>
+</html>

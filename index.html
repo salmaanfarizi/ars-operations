@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abu Salim Trading - Inventory System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #059669 0%, #0891b2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 600px;
+        }
+        h1 {
+            color: #059669;
+            margin-bottom: 30px;
+        }
+        .button-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+        .btn {
+            padding: 20px 40px;
+            background: #10b981;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            background: #059669;
+            transform: translateY(-5px);
+        }
+        .btn.sales {
+            background: #3b82f6;
+        }
+        .btn.sales:hover {
+            background: #2563eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📦 Abu Salim Trading</h1>
+        <h2>Inventory Management System</h2>
+        <p>Select a module to continue:</p>
+        <div class="button-group">
+            <a href="inventory.html" class="btn">📊 Inventory</a>
+            <a href="sales.html" class="btn sales">💰 Sales</a>
+        </div>
+    </div>
+</body>
+</html>
