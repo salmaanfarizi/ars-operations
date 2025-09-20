@@ -726,7 +726,16 @@
 
     <script>
         // Google Apps Script Webhook Configuration
-        const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbyvaGtpNkV9YbMBRlVw_7LCkpv9lFIVdV2v4C6ACmIQPt43oqiUv-5FZERtwNO8GalCNA/exec';
+        // Configuration
+const CONFIG = {
+    WEBHOOK_URL: 'https://script.google.com/macros/s/AKfycbyvaGtpNkV9YbMBRlVw_7LCkpv9lFIVdV2v4C6ACmIQPt43oqiUv-5FZERtwNO8GalCNA/exec',
+    INVENTORY_APP_URL: 'https://abusalim.sa',
+    AUTO_SAVE: true,
+    SAVE_INTERVAL: 60000 // Auto-save every minute
+};
+
+// For backward compatibility
+const WEBHOOK_URL = CONFIG.WEBHOOK_URL;
         
         // Product pricing data (SAR) - Your actual products and prices
         const PRODUCTS = {
