@@ -6,3 +6,7 @@
   [headers.values]
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
+    Access-Control-Allow-Origin = "*"
+
+[functions]
+  directory = "netlify/functions"
