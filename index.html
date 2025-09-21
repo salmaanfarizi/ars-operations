@@ -3,65 +3,245 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Abu Salim Trading - Inventory System</title>
+    <title>ARS International - Inventory Management System</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
             background: linear-gradient(135deg, #059669 0%, #0891b2 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 0;
+            animation: gradientShift 10s ease infinite;
         }
+        
+        @keyframes gradientShift {
+            0%, 100% { background: linear-gradient(135deg, #059669 0%, #0891b2 100%); }
+            50% { background: linear-gradient(135deg, #0891b2 0%, #059669 100%); }
+        }
+        
         .container {
             background: white;
-            padding: 40px;
+            padding: 50px;
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.3);
             text-align: center;
-            max-width: 600px;
+            max-width: 700px;
+            width: 90%;
+            animation: slideIn 0.5s ease;
         }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .logo {
+            font-size: 60px;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
         h1 {
             color: #059669;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
+            font-size: 36px;
+            font-weight: 700;
         }
+        
+        h2 {
+            color: #6b7280;
+            margin-bottom: 30px;
+            font-size: 20px;
+            font-weight: 400;
+        }
+        
+        p {
+            color: #374151;
+            margin-bottom: 40px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
         .button-group {
             display: flex;
             gap: 20px;
             justify-content: center;
+            flex-wrap: wrap;
         }
+        
         .btn {
             padding: 20px 40px;
-            background: #10b981;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
             text-decoration: none;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 18px;
-            font-weight: bold;
+            font-weight: 600;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
         }
+        
         .btn:hover {
-            background: #059669;
             transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.5);
         }
+        
         .btn.sales {
-            background: #3b82f6;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
         }
+        
         .btn.sales:hover {
-            background: #2563eb;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.5);
+        }
+        
+        .btn-icon {
+            font-size: 24px;
+        }
+        
+        .status-bar {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .version {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+        }
+        
+        @media (max-width: 640px) {
+            .container {
+                padding: 30px;
+            }
+            
+            h1 {
+                font-size: 28px;
+            }
+            
+            h2 {
+                font-size: 18px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📦 Abu Salim Trading</h1>
+        <div class="logo">📦</div>
+        <h1>ARS International.</h1>
         <h2>Inventory Management System</h2>
-        <p>Select a module to continue:</p>
+        <p>Comprehensive inventory tracking and sales reconciliation system for Al-Hasa routes. Select a module to continue:</p>
+        
         <div class="button-group">
-            <a href="inventory.html" class="btn">📊 Inventory</a>
-            <a href="sales.html" class="btn sales">💰 Sales</a>
+            <a href="inventory.html" class="btn">
+                <span class="btn-icon">📊</span>
+                <span>Inventory Module</span>
+            </a>
+            <a href="sales.html" class="btn sales">
+                <span class="btn-icon">💰</span>
+                <span>Sales & Cash Module</span>
+            </a>
+        </div>
+        
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-indicator"></div>
+                <span>System Online</span>
+            </div>
+            <div class="status-item">
+                <span>5 Routes Available</span>
+            </div>
+            <div class="status-item">
+                <span id="currentDate"></span>
+            </div>
         </div>
     </div>
+    
+    <div class="version">v2.0.0</div>
+    
+    <script>
+        // Set current date
+        const today = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('currentDate').textContent = today.toLocaleDateString('en-US', options);
+        
+        // Check system status
+        async function checkSystemStatus() {
+            try {
+                const response = await fetch('/.netlify/functions/sheets-api', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'testConnection' })
+                });
+                
+                if (response.ok) {
+                    console.log('System connected to Google Sheets');
+                }
+            } catch (error) {
+                console.error('System check failed:', error);
+            }
+        }
+        
+        // Check status on load
+        checkSystemStatus();
+    </script>
 </body>
 </html>
